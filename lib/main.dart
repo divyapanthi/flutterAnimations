@@ -27,14 +27,25 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  Color _end = Colors.black;
+class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin{
+  Future<void> _incrementCounter() async {}
 
-  void _incrementCounter() {
-    setState(() {
-      _end = Colors.blue;
-    });
+  Animation<double> animation;
+  AnimationController controller;
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+        duration: Duration(seconds: 1),
+        vsync: this
+    );
+    animation = CurvedAnimation(
+        curve: Curves.easeInOut,
+        parent: controller
+    );
+    controller.repeat();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -46,21 +57,11 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            TweenAnimationBuilder<Color>(
-                tween: Tween(begin: Colors.white, end: _end),
-                duration: Duration(seconds: 2),
-                builder: (context, color, child ){
-                  return ColorFiltered(
-                      child: Image.network(
-                        "https://purepng.com/public/uploads/large/purepng.com-earthearthplanetglobethird-planet-from-the-sun-1411526987961jvz5u.png",
-                        height: 200,
-                        width: 200,
-                        fit: BoxFit.contain,
-                      ),
-                      colorFilter: ColorFilter.mode(color, BlendMode.color)
-                  );
-                },
-            )
+            ScaleTransition(
+              alignment: Alignment.center,
+              child: Container(width: 100,height: 100,color:Colors.red),
+              scale: animation,
+            ),
           ],
         ),
       ),
@@ -68,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
