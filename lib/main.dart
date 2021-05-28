@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -30,11 +32,18 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   Color _end = Colors.black;
 
-  void _incrementCounter() {
+  Future<void> _incrementCounter() async {
     setState(() {
       _end = Colors.blue;
     });
+
+    await Future.delayed(Duration(seconds: 3));
+    setState(() {
+      _end = Colors.red;
+    });
   }
+
+  int counter = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -47,16 +56,25 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             TweenAnimationBuilder<Color>(
-                tween: Tween(begin: Colors.white, end: _end),
+                tween: ColorTween(begin: Colors.white, end: _end),
                 duration: Duration(seconds: 2),
+                onEnd: (){
+                  setState(() {
+                    _end = Colors.primaries[Random().nextInt(17)];
+                  });
+                },
+                child:  Image.network(
+                  "https://www.businessinsider.in/thumb.cms?msid=73771721&width=1200&height=900",
+                  height: 200,
+                  width: 200,
+                  fit: BoxFit.contain,
+                ),
                 builder: (context, color, child ){
+                  counter ++;
+                  print("counter $counter");
+
                   return ColorFiltered(
-                      child: Image.network(
-                        "https://purepng.com/public/uploads/large/purepng.com-earthearthplanetglobethird-planet-from-the-sun-1411526987961jvz5u.png",
-                        height: 200,
-                        width: 200,
-                        fit: BoxFit.contain,
-                      ),
+                      child: child,
                       colorFilter: ColorFilter.mode(color, BlendMode.color)
                   );
                 },
