@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simple_animation/src/widgets/cat.dart';
 
 void main() {
   runApp(MyApp());
@@ -27,25 +28,26 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin{
-  Future<void> _incrementCounter() async {}
+class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
 
-  Animation<double>? animation;
-  AnimationController? controller;
-  @override
-  void initState() {
-    super.initState();
-    controller = AnimationController(
-        duration: Duration(seconds: 1),
-        vsync: this
-    );
-    animation = CurvedAnimation(
-        curve: Curves.easeInOut,
-        parent: controller!
-    );
-    controller!.repeat();
-  }
 
+  late AnimationController catController =
+  AnimationController(duration: Duration(seconds: 1), vsync: this)
+      ..repeat();
+
+  late Animation<double> catAnimation =
+    Tween<double> (begin: 0, end: 100).animate(
+    CurvedAnimation(
+      curve: Curves.easeInOut,
+      parent: catController)
+    );
+
+
+  // @override
+  // void initState(){
+  //   super.initState();
+  //   catController!.forward();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -57,24 +59,24 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            FadeTransition(
-              opacity: Tween<double>(begin: .4, end: 1).animate(animation!),
-              child: RotationTransition(
-                turns: Tween<double>(begin:1, end: 44/7).animate(animation!),
-                child: ScaleTransition(
-                alignment: Alignment.center,
-                child: Container(width: 100,height: 100,color:Colors.red),
-                scale: Tween<double>(begin: 1,end: 3).animate(animation!),
-              ),),
-            ),
+            buildCatAnimation(),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
     );
   }
+
+  Widget buildCatAnimation(){
+    return AnimatedBuilder(
+        animation: catAnimation,
+        builder: (BuildContext context, Widget? child){
+          return Container(
+            margin: EdgeInsets.only(bottom: catAnimation.value),
+              child: Cat(),
+          );
+        },
+      child: Cat(),
+    );
+  }
+
 }
