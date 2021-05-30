@@ -57,10 +57,15 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ScaleTransition(
-              alignment: Alignment.center,
-              child: Container(width: 100,height: 100,color:Colors.red),
-              scale: Tween<double>(begin: 1,end: 3).animate(animation!),
+            FadeTransition(
+              opacity: Tween<double>(begin: .4, end: 1).animate(animation!),
+              child: RotationTransition(
+                turns: Tween<double>(begin:1, end: 44/7).animate(animation!),
+                child: ScaleTransition(
+                alignment: Alignment.center,
+                child: Container(width: 100,height: 100,color:Colors.red),
+                scale: Tween<double>(begin: 1,end: 3).animate(animation!),
+              ),),
             ),
           ],
         ),
