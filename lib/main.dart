@@ -19,9 +19,9 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, this.title!}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -30,8 +30,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin{
   Future<void> _incrementCounter() async {}
 
-  Animation<double> animation;
-  AnimationController controller;
+  Animation<double>? animation;
+  AnimationController? controller;
   @override
   void initState() {
     super.initState();
@@ -41,9 +41,9 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     );
     animation = CurvedAnimation(
         curve: Curves.easeInOut,
-        parent: controller
+        parent: controller!
     );
-    controller.repeat();
+    controller!.repeat();
   }
 
 
@@ -51,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title!),
       ),
       body: Center(
         child: Column(
@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
             ScaleTransition(
               alignment: Alignment.center,
               child: Container(width: 100,height: 100,color:Colors.red),
-              scale: animation,
+              scale: Tween<double>(begin: 1,end: 3).animate(animation!),
             ),
           ],
         ),
