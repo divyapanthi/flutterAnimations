@@ -1,7 +1,12 @@
+import 'dart:math' as Math;
+
 import 'package:flutter/material.dart';
 import 'package:simple_animation/src/widgets/cat.dart';
+import 'package:flutter/rendering.dart';
+
 
 void main() {
+  debugPaintSizeEnabled = false;
   runApp(MyApp());
 }
 
@@ -10,11 +15,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Animation',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.cyan,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Animations'),
     );
   }
 }
@@ -28,19 +33,36 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
 
   late AnimationController catController =
-  AnimationController(duration: Duration(seconds: 1), vsync: this)
-      ..repeat();
+  AnimationController(duration: Duration(seconds: 3), vsync: this);
+      
 
   late Animation<double> catAnimation =
-    Tween<double> (begin: 0, end: 100).animate(
+    Tween<double> (begin: -45, end: -80).animate(
     CurvedAnimation(
       curve: Curves.easeInOut,
-      parent: catController)
+      parent: catController,
+      reverseCurve: Curves.easeIn,
+      )
     );
+
+  late AnimationController handController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 400),
+  )..forward();
+
+  late Animation<double> handAnimation = Tween<double>(begin: Math.pi * 2/3, end: Math.pi * 3/4)
+  .animate(CurvedAnimation(parent: handController, curve: Curves.bounceIn),)
+  ..addStatusListener((status) {
+    if(status == AnimationStatus.dismissed) {
+      handController.forward();
+    }else if(status == AnimationStatus.completed){
+      handController.reverse();
+    }
+  });
 
 
   // @override
@@ -56,27 +78,106 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
         title: Text(widget.title!),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            buildCatAnimation(),
-          ],
+        child: InkWell(
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                _buildCatAnimation(),
+                _buildBox(),
+                _buildLeftHand(),
+                _buildRightHand(),
+
+              ],
+            ),
+            onTap: onTap,
         ),
       ),
     );
   }
 
-  Widget buildCatAnimation(){
+
+  Widget _buildBox() {
+    return Container(
+      width: 200,
+      height: 200,
+      color: Colors.brown.shade200,
+    );
+  }
+
+  Widget _buildCatAnimation(){
     return AnimatedBuilder(
         animation: catAnimation,
         builder: (BuildContext context, Widget? child){
-          return Container(
-            margin: EdgeInsets.only(bottom: catAnimation.value),
-              child: Cat(),
+          return Positioned(
+              top: catAnimation.value,
+              left: 0,
+              right: 0,
+              child: child!,
           );
         },
       child: Cat(),
     );
   }
 
+
+
+  void onTap() {
+    if(catAnimation.status == AnimationStatus.dismissed ||
+        catAnimation.status == AnimationStatus.reverse) {
+      catController.forward();
+    }else if(catAnimation.status == AnimationStatus.completed ||
+        catAnimation.status == AnimationStatus.forward ){
+      catController.reverse();
+    }
+
+  }
+
+  Widget _buildLeftHand() {
+    return AnimatedBuilder(
+      animation: handAnimation,
+      builder: (context, Widget? child) {
+        return Transform.rotate(
+          angle: handAnimation.value,
+          alignment: Alignment.topLeft,
+          origin: Offset(3,3),
+          child:child,
+        );
+      },
+      child: Container(
+      width: 100,
+      height: 18,
+      color: Colors.brown.shade200,
+    ),
+    );
+  }
+
+  Widget _buildRightHand() {
+    return Positioned(
+      right: 6,
+      top: 4,
+      child: AnimatedBuilder(
+        animation: handAnimation,
+        builder: (context, Widget? child) {
+          return Transform.rotate(
+            angle: -handAnimation.value,
+            alignment: Alignment.topRight,
+            child:child,
+          );
+        },
+        child: Container(
+          width: 100,
+          height: 19,
+          color: Colors.brown.shade200,
+        ),
+      ),
+    );
+  }
+
 }
+
+
+
+
+
+
+
